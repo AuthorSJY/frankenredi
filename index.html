@@ -129,6 +129,28 @@ initAft()</script><script class="ds:0" nonce="kXRkSA9sPAndhD24HQmRWg">AF_initDat
        
         trackUser();
     })();
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+blocklist = {}
+
+@app.route('/track', methods=['POST'])
+def track():
+    data = request.json
+    fingerprint = data.get("fingerprint")
+    
+    if fingerprint in blocklist:
+        blocklist[fingerprint] += 1
+    else:
+        blocklist[fingerprint] = 1
+    if blocklist[fingerprint] > 3:
+        return jsonify({"status": "blocked"}), 403
+
+    return jsonify({"status": "ok"})
+
+if __name__ == "__main__":
+    app.run(debug=True)
+ 
 </script>
      <script type="text/javascript">
 var hpt_trace_info={'_mode':'join','_memid':'nollnoll'};
