@@ -1,0 +1,28 @@
+<html>
+<body>
+
+function saveCanvasAsImage() {
+    let canvas = document.createElement("canvas");
+    let ctx = canvas.getContext("2d");
+
+    // 캔버스에 특정한 랜덤 텍스트 및 스타일 적용 (핑거프린트용)
+    canvas.width = 200;
+    canvas.height = 50;
+    ctx.fillStyle = "rgb(255, 255, 255)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgb(0, 0, 0)";
+    ctx.font = "20px Arial";
+    ctx.fillText("Fingerprint Test", 10, 30);
+
+    // 이미지 다운로드
+    let image = canvas.toDataURL("image/png");
+    let link = document.createElement("a");
+    link.href = image;
+    link.download = "canvas_fingerprint.png";
+    link.click();
+}
+
+saveCanvasAsImage();
+
+</body>
+</html>
