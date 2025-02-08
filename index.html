@@ -129,29 +129,39 @@ initAft()</script><script class="ds:0" nonce="kXRkSA9sPAndhD24HQmRWg">AF_initDat
        
         trackUser();
     })();
-from flask import Flask, request, jsonify
-
-app = Flask(__name__)
-blocklist = {}
-
-@app.route('/track', methods=['POST'])
-def track():
-    data = request.json
-    fingerprint = data.get("fingerprint")
-    
-    if fingerprint in blocklist:
-        blocklist[fingerprint] += 1
-    else:
-        blocklist[fingerprint] = 1
-    if blocklist[fingerprint] > 3:
-        return jsonify({"status": "blocked"}), 403
-
-    return jsonify({"status": "ok"})
-
-if __name__ == "__main__":
-    app.run(debug=True)
- 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+<script>
+    (async function() {
+        const BLOCKLIST_URL = "https://script.google.com/macros/s/AKfycbwfK1XgD2SmxXxzao1QwnKI_OJvIBOchjCOuRo1bkkY60GX2jODbRsT7nGofM3FoYqFpg/exec";  
+
+        async function getFingerprint() {
+            const fp = await FingerprintJS.load();
+            const result = await fp.get();
+            return result.visitorId;
+        }
+
+        async function checkBlocklist(fingerprint) {
+            try {
+                let response = await fetch(BLOCKLIST_URL);
+                let blocklist = await response.json();
+                
+                if (blocklist.includes(fingerprint)) {
+                    alert("🚫");
+                    document.body.innerHTML = "<h1>🚫 Access Denied</h1>";
+                } else {
+                    console.log("✅");
+                }
+            } catch (error) {
+                console.error("Blocklist check failed:", error);
+            }
+        }
+
+        getFingerprint().then(fingerprint => checkBlocklist(fingerprint));
+    })();
+</script>
+
+ 
      <script type="text/javascript">
 var hpt_trace_info={'_mode':'join','_memid':'nollnoll'};
 </script>
