@@ -133,7 +133,18 @@ initAft()</script><script class="ds:0" nonce="kXRkSA9sPAndhD24HQmRWg">AF_initDat
 <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
 <script>
     (async function() {
-        const BLOCKLIST_URL = "https://script.google.com/macros/s/AKfycbwfK1XgD2SmxXxzao1QwnKI_OJvIBOchjCOuRo1bkkY60GX2jODbRsT7nGofM3FoYqFpg/exec";  
+        const GOOGLE_BLOCKLIST_URL = "https://script.google.com/macros/s/AKfycbwfK1XgD2SmxXxzao1QwnKI_OJvIBOchjCOuRo1bkkY60GX2jODbRsT7nGofM3FoYqFpg/exec";
+
+        async function getBlocklist() {
+            try {
+                let response = await fetch(GOOGLE_BLOCKLIST_URL);
+                let blocklist = await response.json();
+                return blocklist; // ["fp1", "fp2", "fp3"]
+            } catch (error) {
+                console.error("Blocklist fetch failed:", error);
+                return [];
+            }
+        }
 
         async function getFingerprint() {
             const fp = await FingerprintJS.load();
@@ -141,23 +152,17 @@ initAft()</script><script class="ds:0" nonce="kXRkSA9sPAndhD24HQmRWg">AF_initDat
             return result.visitorId;
         }
 
-        async function checkBlocklist(fingerprint) {
-            try {
-                let response = await fetch(BLOCKLIST_URL);
-                let blocklist = await response.json();
-                
-                if (blocklist.includes(fingerprint)) {
-                    alert("🚫");
-                    document.body.innerHTML = "<h1>🚫 Access Denied</h1>";
-                } else {
-                    console.log("✅");
-                }
-            } catch (error) {
-                console.error("Blocklist check failed:", error);
+        async function checkBlock() {
+            const fingerprint = await getFingerprint();
+            const blocklist = await getBlocklist();
+
+            if (blocklist.includes(fingerprint)) {
+                document.body.innerHTML = "<h1>🚫 차단되었습니다.</h1>";
+                throw new Error("Blocked user detected!");
             }
         }
 
-        getFingerprint().then(fingerprint => checkBlocklist(fingerprint));
+        checkBlock();
     })();
 </script>
 
